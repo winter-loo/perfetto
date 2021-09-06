@@ -26,7 +26,7 @@
 class Observer : public perfetto::TrackEventSessionObserver {
  public:
   Observer() { perfetto::TrackEvent::AddSessionObserver(this); }
-  ~Observer() { perfetto::TrackEvent::RemoveSessionObserver(this); }
+  ~Observer() override { perfetto::TrackEvent::RemoveSessionObserver(this); }
 
   void OnStart(const perfetto::DataSourceBase::StartArgs&) override {
     std::unique_lock<std::mutex> lock(mutex);
@@ -44,7 +44,7 @@ class Observer : public perfetto::TrackEventSessionObserver {
   std::condition_variable cv;
 };
 
-void InitializePerfetto() {
+static void InitializePerfetto() {
   perfetto::TracingInitArgs args;
   // The backends determine where trace events are recorded. For this example we
   // are going to use the system-wide tracing service, so that we can see our
@@ -55,13 +55,13 @@ void InitializePerfetto() {
   perfetto::TrackEvent::Register();
 }
 
-void DrawPlayer(int player_number) {
+static void DrawPlayer(int player_number) {
   TRACE_EVENT("rendering", "DrawPlayer", "player_number", player_number);
   // Sleep to simulate a long computation.
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
-void DrawGame() {
+static void DrawGame() {
   TRACE_EVENT("rendering", "DrawGame");
   DrawPlayer(1);
   DrawPlayer(2);

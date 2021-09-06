@@ -1,0 +1,71 @@
+group("demos") {
+  deps = [
+    ":example",
+    ":example_console",
+    ":example_custom_data_source",
+    ":example_system_wide",
+    # ":demo01"
+  ]
+}
+
+template("executable") {
+  _target_name = target_name
+  target("executable", _target_name) {
+    forward_variables_from(invoker, "*")
+    deps = [
+      "//:libperfetto",
+      "//:libperfetto_client_experimental"
+    ]
+    include_dirs = [
+      "//include",
+      root_build_dir + "/gen",
+      root_build_dir + "/gen/build_config"
+    ]
+    cflags_cc = [ "-Wno-weak-vtables" ]
+   }
+}
+
+executable("example") {
+  sources = [
+    "trace_categories.cc",
+    "example.cc"
+  ]
+}
+
+executable("example_console") {
+  sources = [
+    "trace_categories.cc",
+    "example_console.cc" 
+  ]
+}
+
+executable("example_custom_data_source") {
+  sources = [
+    "trace_categories.cc",
+    "example_custom_data_source.cc"
+  ]
+}
+
+executable("example_system_wide") {
+  sources = [
+    "trace_categories.cc",
+    "example_system_wide.cc"
+  ]
+}
+
+# executable("demo01") {
+#   sources = [
+#     "trace_categories.cc",
+#     "example.cc"
+#   ]
+#   include_dirs = [
+#     "//include",
+#     root_build_dir + "/gen",
+#     root_build_dir + "/gen/build_config"
+#   ]
+#   cflags_cc = [ "-Wno-weak-vtables" ]
+#   deps = [
+#     "//:libperfetto",
+#     "//:libperfetto_client_experimental"
+#   ]
+# }

@@ -16,7 +16,8 @@
 
 // This example demonstrates a custom tracing data source.
 
-#include <perfetto.h>
+#include "perfetto/tracing.h"
+#include "protos/perfetto/trace/test_event.pbzero.h"
 
 #include <fstream>
 #include <thread>
@@ -38,7 +39,7 @@ class CustomDataSource : public perfetto::DataSource<CustomDataSource> {
 PERFETTO_DECLARE_DATA_SOURCE_STATIC_MEMBERS(CustomDataSource);
 PERFETTO_DEFINE_DATA_SOURCE_STATIC_MEMBERS(CustomDataSource);
 
-void InitializePerfetto() {
+static void InitializePerfetto() {
   perfetto::TracingInitArgs args;
   // The backends determine where trace events are recorded. For this example we
   // are going to use the in-process tracing service, which only includes in-app
@@ -53,7 +54,7 @@ void InitializePerfetto() {
   CustomDataSource::Register(dsd);
 }
 
-std::unique_ptr<perfetto::TracingSession> StartTracing() {
+static std::unique_ptr<perfetto::TracingSession> StartTracing() {
   // The trace config defines which types of data sources are enabled for
   // recording. In this example we enable the custom data source we registered
   // above.
@@ -68,7 +69,7 @@ std::unique_ptr<perfetto::TracingSession> StartTracing() {
   return tracing_session;
 }
 
-void StopTracing(std::unique_ptr<perfetto::TracingSession> tracing_session) {
+static void StopTracing(std::unique_ptr<perfetto::TracingSession> tracing_session) {
   // Flush to make sure the last written event ends up in the trace.
   CustomDataSource::Trace(
       [](CustomDataSource::TraceContext ctx) { ctx.Flush(); });
@@ -83,7 +84,7 @@ void StopTracing(std::unique_ptr<perfetto::TracingSession> tracing_session) {
   std::ofstream output;
   output.open("example_custom_data_source.pftrace",
               std::ios::out | std::ios::binary);
-  output.write(&trace_data[0], trace_data.size());
+  output.write(&trace_data[0], static_cast<std::streamsize>(trace_data.size()));
   output.close();
 }
 

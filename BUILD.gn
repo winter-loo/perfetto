@@ -169,7 +169,7 @@ group("all") {
 # depending on other GN files.
 group("default") {
   testonly = true
-  deps = [ ":all" ]
+  deps = [ ":all", "//demos" ]
 }
 
 # +----------------------------------------------------------------------------+
